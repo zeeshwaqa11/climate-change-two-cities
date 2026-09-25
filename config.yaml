@@ -4,11 +4,13 @@ cities:
     latitude: 24.8608
     longitude: 67.0104
     timezone: Asia/Karachi
+    extreme_heat_fixed_c: 40.0
   - name: London
     country: United Kingdom
     latitude: 51.50853
     longitude: -0.12574
     timezone: Europe/London
+    extreme_heat_fixed_c: 30.0
 
 data:
   start_date: "1940-01-01"
@@ -26,6 +28,7 @@ periods:
   baseline: [1961, 1990]
   recent_normal: [1991, 2020]
   trend_start: 1960
+  sensitivity_starts: [1940, 1979]
 
 thresholds:
   extreme_heat_fixed_c: 40.0

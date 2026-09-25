@@ -18,10 +18,16 @@ class City:
     latitude: float
     longitude: float
     timezone: str = "auto"
+    extreme_heat_fixed_c: float | None = None
 
     @property
     def slug(self) -> str:
         return self.name.lower().replace(" ", "_")
+
+    def heat_threshold(self, config: dict[str, Any]) -> float:
+        if self.extreme_heat_fixed_c is not None:
+            return float(self.extreme_heat_fixed_c)
+        return float(config["thresholds"]["extreme_heat_fixed_c"])
 
 
 def load_config(path: Path = CONFIG_PATH) -> dict[str, Any]:
