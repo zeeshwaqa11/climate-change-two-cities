@@ -1,0 +1,19 @@
+{
+  "city": "Karachi",
+  "requested_latitude": 24.8608,
+  "requested_longitude": 67.0104,
+  "grid_latitude": 24.850615,
+  "grid_longitude": 66.992485,
+  "elevation_m": 8.0,
+  "timezone": "Asia/Karachi",
+  "units": {
+    "time": "iso8601",
+    "temperature_2m_max": "\u00b0C",
+    "temperature_2m_min": "\u00b0C",
+    "temperature_2m_mean": "\u00b0C",
+    "precipitation_sum": "mm",
+    "wind_speed_10m_max": "km/h"
+  },
+  "end_year": 2025,
+  "fetched_at": "2026-09-25T19:50:24+00:00"
+}

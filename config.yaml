@@ -1,0 +1,45 @@
+cities:
+  - name: Karachi
+    country: Pakistan
+    latitude: 24.8608
+    longitude: 67.0104
+    timezone: Asia/Karachi
+  - name: London
+    country: United Kingdom
+    latitude: 51.50853
+    longitude: -0.12574
+    timezone: Europe/London
+
+data:
+  start_date: "1940-01-01"
+  end_year: null
+  variables:
+    - temperature_2m_max
+    - temperature_2m_min
+    - temperature_2m_mean
+    - precipitation_sum
+    - wind_speed_10m_max
+  archive_url: https://archive-api.open-meteo.com/v1/archive
+  geocoding_url: https://geocoding-api.open-meteo.com/v1/search
+
+periods:
+  baseline: [1961, 1990]
+  recent_normal: [1991, 2020]
+  trend_start: 1960
+
+thresholds:
+  extreme_heat_fixed_c: 40.0
+  extreme_heat_percentile: 95
+  wet_day_mm: 1.0
+  heavy_rain_mm: 20.0
+  rolling_window_years: 10
+
+fetch:
+  retries: 5
+  backoff_seconds: 5
+  timeout_seconds: 120
+
+paths:
+  raw: data/raw
+  processed: data/processed
+  figures: figures
