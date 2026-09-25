@@ -70,13 +70,11 @@ def payload_metadata(payload: dict[str, Any], city: City, end_year: int, config:
     }
 
 
-def fetch_city(city: City, config: dict[str, Any], force: bool = False) -> Path:
-    raw_dir = resolve_path(config, "raw")
-    csv_path = raw_dir / f"{city.slug}.csv"
-    meta_path = raw_dir / f"{city.slug}_meta.json"
+def download_city(city: City, config: dict[str, Any], csv_path: Path, meta_path: Path, force: bool = False) -> Path:
     if csv_path.exists() and not force:
         print(f"{city.name}: {csv_path.name} exists, skipping (use --force to re-download)")
         return csv_path
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
     end_year = last_complete_year(config)
     print(f"{city.name}: downloading {config['data']['start_date']} to {end_year}-12-31")
     payload = request_with_retries(config["data"]["archive_url"], build_params(city, config, end_year), config)
@@ -85,6 +83,11 @@ def fetch_city(city: City, config: dict[str, Any], force: bool = False) -> Path:
     meta_path.write_text(json.dumps(payload_metadata(payload, city, end_year, config), indent=2), encoding="utf-8")
     print(f"{city.name}: saved {len(frame):,} rows to {csv_path.name}")
     return csv_path
+
+
+def fetch_city(city: City, config: dict[str, Any], force: bool = False) -> Path:
+    raw_dir = resolve_path(config, "raw")
+    return download_city(city, config, raw_dir / f"{city.slug}.csv", raw_dir / f"{city.slug}_meta.json", force)
 
 
 def fetch_all(config: dict[str, Any] | None = None, force: bool = False, only: str | None = None) -> list[Path]:

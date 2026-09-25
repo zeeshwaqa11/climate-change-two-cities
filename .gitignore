@@ -12,3 +12,4 @@ app/cache/
 .DS_Store
 Thumbs.db
 *.egg-info/
+.claude/

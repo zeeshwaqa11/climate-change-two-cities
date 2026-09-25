@@ -71,8 +71,7 @@ def quality_report(raw: pd.DataFrame, cleaned: pd.DataFrame, issues: dict[str, i
     }
 
 
-def clean_city(city: City, config: dict[str, Any]) -> tuple[pd.DataFrame, dict[str, Any]]:
-    raw_path = resolve_path(config, "raw") / f"{city.slug}.csv"
+def clean_file(raw_path: Path, config: dict[str, Any]) -> tuple[pd.DataFrame, dict[str, Any]]:
     if not raw_path.exists():
         raise FileNotFoundError(f"{raw_path} not found. Run `python -m src.fetch` first.")
     raw = load_raw(raw_path)
@@ -81,6 +80,10 @@ def clean_city(city: City, config: dict[str, Any]) -> tuple[pd.DataFrame, dict[s
     frame, issues = mask_impossible_values(frame)
     frame = add_features(frame, config["thresholds"]["wet_day_mm"])
     return frame[DAILY_COLUMNS], quality_report(raw, frame, issues)
+
+
+def clean_city(city: City, config: dict[str, Any]) -> tuple[pd.DataFrame, dict[str, Any]]:
+    return clean_file(resolve_path(config, "raw") / f"{city.slug}.csv", config)
 
 
 def processed_path(city: City, config: dict[str, Any]) -> Path:

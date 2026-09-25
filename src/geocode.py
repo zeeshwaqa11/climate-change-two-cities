@@ -23,6 +23,7 @@ def search_city(name: str, config: dict[str, Any], count: int = 5) -> list[City]
             latitude=round(item["latitude"], 5),
             longitude=round(item["longitude"], 5),
             timezone=item.get("timezone", "auto"),
+            admin1=item.get("admin1", ""),
         )
         for item in results
     ]

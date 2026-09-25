@@ -19,6 +19,7 @@ class City:
     longitude: float
     timezone: str = "auto"
     extreme_heat_fixed_c: float | None = None
+    admin1: str = ""
 
     @property
     def slug(self) -> str:
