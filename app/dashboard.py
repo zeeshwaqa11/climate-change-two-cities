@@ -33,6 +33,11 @@ def cached_analysis(city: City) -> CityAnalysis:
     return live.analyse_place(city, CONFIG)
 
 
+@st.cache_data(show_spinner=False)
+def cached_suggestion(city: City) -> float:
+    return live.suggest_threshold(live.load_history(city, CONFIG), CONFIG)
+
+
 def signed(value: float, digits: int = 2) -> str:
     return f"{value:+.{digits}f}".replace("-", "−")
 
@@ -54,19 +59,27 @@ def sidebar_selection() -> City | None:
         return None
     labels = [live.place_label(match) for match in matches]
     chosen = st.sidebar.selectbox("Matches", range(len(matches)), format_func=lambda index: labels[index])
+    place = matches[chosen]
+    with st.spinner(f"Loading history for {live.place_label(place)}..."):
+        try:
+            suggestion = cached_suggestion(place)
+        except Exception as error:
+            st.sidebar.error(f"Could not load data: {error}")
+            return None
     threshold = st.sidebar.number_input(
         "Fixed heat threshold (°C)",
         min_value=0.0,
         max_value=60.0,
-        value=30.0,
+        value=suggestion,
         step=1.0,
-        help="Used for the fixed-threshold chart. The percentile chart adapts to each city automatically.",
+        key=f"threshold_{live.cache_stem(place)}",
+        help="Defaults to this city's 1961–1990 99th percentile of daily maximum. Used for the fixed-threshold chart; the percentile chart adapts automatically.",
     )
     st.sidebar.caption(
         "Data: Open-Meteo.com (CC BY 4.0), ERA5 reanalysis from the Copernicus Climate Change Service. "
         "First download of a new city takes about 10 to 30 seconds and is then cached."
     )
-    return replace(matches[chosen], extreme_heat_fixed_c=float(threshold))
+    return replace(place, extreme_heat_fixed_c=float(threshold))
 
 
 def headline_metrics(analysis: CityAnalysis) -> None:
@@ -77,8 +90,8 @@ def headline_metrics(analysis: CityAnalysis) -> None:
     warmest = annual["tmean"].idxmax()
     columns = st.columns(4)
     columns[0].metric(
-        f"Warming trend since {TREND_START}",
-        f"{signed(row['slope_per_decade'])} °C / decade",
+        f"Warming per decade since {TREND_START}",
+        f"{signed(row['slope_per_decade'])} °C",
         f"95% CI {signed(row['ci_low_per_decade'])} to {signed(row['ci_high_per_decade'])}, {format_p(row['p_value'])}",
         delta_color="off",
     )
@@ -89,9 +102,9 @@ def headline_metrics(analysis: CityAnalysis) -> None:
         delta_color="off",
     )
     columns[2].metric(
-        "Extreme hot days per year",
+        "Extreme hot days per year, 2016–2025",
         f"{recent['hot_days_pct'].mean():.0f}",
-        f"{baseline_days:.0f} in 1961–1990 (2016–2025 average shown)",
+        f"vs {baseline_days:.0f} a year in 1961–1990",
         delta_color="off",
     )
     columns[3].metric("Warmest year", str(warmest), f"{annual.loc[warmest, 'tmean']:.1f} °C mean", delta_color="off")

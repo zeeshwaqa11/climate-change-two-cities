@@ -129,4 +129,13 @@ def test_anomaly_figure_has_bars_and_trend_line(analysis):
 def test_heat_figure_has_bars_and_rolling_line(analysis, metric):
     fig = interactive.heat_figure(analysis, metric, 10)
     assert [trace.type for trace in fig.data] == ["bar", "scatter"]
-    assert "Testville" in fig.layout.title.text
+    assert fig.layout.title.text.startswith("Days above")
+
+
+def test_suggest_threshold_is_rounded_baseline_percentile(config):
+    daily = make_daily(1961, 1990)
+    rng = np.random.default_rng(9)
+    daily["tmax"] = rng.normal(30, 4, len(daily))
+    expected = round(np.percentile(daily["tmax"], 99))
+    assert live.suggest_threshold(daily, config) == expected
+    assert isinstance(live.suggest_threshold(daily, config), float)

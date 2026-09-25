@@ -68,6 +68,7 @@ def anomaly_figure(analysis: CityAnalysis, start_year: int) -> go.Figure:
             y=anomaly.to_numpy(),
             marker={"color": colors},
             name="Annual anomaly",
+            showlegend=False,
             hovertemplate="%{x}: %{y:+.2f} °C<extra></extra>",
         )
     )
@@ -94,7 +95,7 @@ def heat_figure(analysis: CityAnalysis, metric: str, window: int) -> go.Figure:
     series = analysis.annual[metric].astype(float)
     limits = analysis.thresholds
     if metric == "hot_days_pct":
-        title = f"Days above {limits['percentile_heat_c']:.1f} °C ({limits['percentile']:.0f}th percentile of 1961–1990 daily maximum)"
+        title = f"Days above {limits['percentile_heat_c']:.1f} °C ({limits['percentile']:.0f}th percentile)"
     else:
         title = f"Days above {limits['fixed_heat_c']:.0f} °C"
     fig = go.Figure(
@@ -127,5 +128,5 @@ def heat_figure(analysis: CityAnalysis, metric: str, window: int) -> go.Figure:
             annotation_position="top left",
             annotation_font={"size": 11, "color": MUTED},
         )
-    base_layout(fig, f"{analysis.city.name}: {title}", 420, "Days per year")
+    base_layout(fig, title, 420, "Days per year")
     return fig

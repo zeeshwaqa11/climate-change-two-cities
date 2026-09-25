@@ -38,7 +38,7 @@ The full report, with one section per research question, is in [`notebooks/clima
 
 ## Tools used
 
-Python 3.12 · requests · pandas · NumPy · SciPy · pymannkendall · matplotlib · seaborn · Jupyter · pytest · PyYAML · Git
+Python 3.12 · requests · pandas · NumPy · SciPy · pymannkendall · matplotlib · seaborn · Plotly · Streamlit · Jupyter · pytest · PyYAML · Git
 
 ## How to reproduce
 
@@ -49,7 +49,19 @@ python run_all.py
 jupyter lab notebooks/climate_analysis.ipynb
 ```
 
-`run_all.py` fetches the data (skipped if it already exists; add `--force` to re-download), cleans it, runs the analysis and exports the figures. The processed data is committed, so the notebook also runs without downloading anything. Run `python -m pytest` for the 80 unit tests. To add a city, look it up with `python -m src.geocode "City name"`, paste the output into `config.yaml` and re-run `run_all.py`.
+`run_all.py` fetches the data (skipped if it already exists; add `--force` to re-download), cleans it, runs the analysis and exports the figures. The processed data is committed, so the notebook also runs without downloading anything. Run `python -m pytest` for the 92 unit tests. To add a city, look it up with `python -m src.geocode "City name"`, paste the output into `config.yaml` and re-run `run_all.py`.
+
+## Optional interactive dashboard
+
+Type any city name and the app geocodes it, downloads and caches its 86-year ERA5 history, and shows its warming stripes, annual anomaly with trend, and extreme-heat charts (Plotly, with hover tooltips).
+
+```bash
+streamlit run app/dashboard.py
+```
+
+The first download of a new city takes about 10 to 30 seconds (longer if the free API is busy) and is cached in `app/cache/`, so later visits are instant. The fixed heat threshold defaults to each city's own 1961-1990 99th percentile of daily maximum.
+
+![Streamlit dashboard showing Karachi](docs/dashboard.png)
 
 ## Project structure
 
@@ -67,13 +79,18 @@ climate-analysis/
 │   ├── clean.py             reindexing, validation, feature columns
 │   ├── analysis.py          anomalies, trends, extremes, dry spells, normals
 │   ├── report.py            markdown tables used by the notebook
-│   └── plots.py             all charts, one consistent style
+│   ├── plots.py             all static charts, one consistent style
+│   ├── live.py              per-city download cache used by the dashboard
+│   └── interactive.py       Plotly versions of the charts for the dashboard
+├── app/
+│   └── dashboard.py         Streamlit dashboard (optional)
 ├── notebooks/
 │   └── climate_analysis.ipynb   the executed report
 ├── data/
 │   ├── raw/                 API responses, one CSV per city plus metadata
 │   └── processed/           cleaned daily data, annual and monthly tables, trend results
 ├── figures/                 PNG charts (200 dpi)
+├── docs/                    dashboard screenshot
 └── tests/                   pytest tests on synthetic data with known answers
 ```
 
@@ -90,6 +107,8 @@ A guide to what each module does, for anyone reading the source.
 | | `monthly_climatology`, `normals_comparison`, `monthly_anomaly_matrix` | Monthly normals, the 1961-1990 vs 1991-2020 comparison and the month by year anomaly grid. |
 | `plots.py` | `plot_*`, `export_figures` | Every chart, sharing one style, one colour-blind-safe palette and a source credit. |
 | `report.py` | `*_markdown` | Formats analysis results as tables for the notebook. |
+| `live.py` | `load_history`, `analyse_place`, `suggest_threshold` | Downloads any city's history into a coordinate-keyed cache, refreshes it when it is out of date, and reuses the same clean and analyse code as the main pipeline. |
+| `interactive.py` | `stripes_figure`, `anomaly_figure`, `heat_figure` | Plotly charts for the dashboard. |
 
 ## Limitations
 

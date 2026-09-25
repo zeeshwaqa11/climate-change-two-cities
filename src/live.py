@@ -7,7 +7,7 @@ from typing import Any
 
 import pandas as pd
 
-from src.analysis import CityAnalysis, analyze_city
+from src.analysis import CityAnalysis, analyze_city, baseline_percentile
 from src.clean import clean_file
 from src.config import ROOT, City, last_complete_year
 from src.fetch import download_city
@@ -62,3 +62,8 @@ def search_places(query: str, config: dict[str, Any], count: int = 8) -> list[Ci
     if len(query) < 2:
         return []
     return search_city(query, config, count)
+
+
+def suggest_threshold(daily: pd.DataFrame, config: dict[str, Any], percentile: float = 99.0) -> float:
+    baseline = tuple(config["periods"]["baseline"])
+    return float(round(baseline_percentile(daily, "tmax", percentile, baseline)))
