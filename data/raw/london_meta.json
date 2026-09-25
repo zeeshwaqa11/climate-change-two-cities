@@ -2,8 +2,8 @@
   "city": "London",
   "requested_latitude": 51.50853,
   "requested_longitude": -0.12574,
-  "grid_latitude": 51.493847,
-  "grid_longitude": -0.1630249,
+  "grid_latitude": 51.5,
+  "grid_longitude": -0.25,
   "elevation_m": 23.0,
   "timezone": "Europe/London",
   "units": {
@@ -15,5 +15,6 @@
     "wind_speed_10m_max": "km/h"
   },
   "end_year": 2025,
-  "fetched_at": "2026-09-25T19:51:04+00:00"
+  "model": "era5",
+  "fetched_at": "2026-09-25T20:07:17+00:00"
 }

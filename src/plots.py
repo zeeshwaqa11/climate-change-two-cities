@@ -308,7 +308,7 @@ def plot_extreme_heat(results: Results, config: dict[str, Any]) -> Figure:
             ax.plot(series.index, rolling_mean(series, window), color=INK, lw=2.2, zorder=4, solid_capstyle="round")
             row = trend_row(analysis, metric, start)
             ax.set_title(title, fontsize=10)
-            ax.set_title(trend_text(row, "days", 1), loc="right", fontsize=8.5, color=INK, fontweight="normal")
+            ax.set_title(trend_text(row, "days", 2 if metric == "hot_days_fixed" else 1), loc="right", fontsize=8.5, color=INK, fontweight="normal")
             ax.set_ylabel("Days per year")
             ax.yaxis.set_major_locator(MaxNLocator(integer=True))
             format_year_axis(ax, series, label=row_axes is axes[-1])

@@ -22,6 +22,7 @@ def build_params(city: City, config: dict[str, Any], end_year: int) -> dict[str,
         "end_date": f"{end_year}-12-31",
         "daily": ",".join(config["data"]["variables"]),
         "timezone": city.timezone,
+        "models": config["data"]["model"],
     }
 
 
@@ -53,7 +54,7 @@ def payload_to_frame(payload: dict[str, Any]) -> pd.DataFrame:
     return frame
 
 
-def payload_metadata(payload: dict[str, Any], city: City, end_year: int) -> dict[str, Any]:
+def payload_metadata(payload: dict[str, Any], city: City, end_year: int, config: dict[str, Any]) -> dict[str, Any]:
     return {
         "city": city.name,
         "requested_latitude": city.latitude,
@@ -64,6 +65,7 @@ def payload_metadata(payload: dict[str, Any], city: City, end_year: int) -> dict
         "timezone": payload.get("timezone"),
         "units": payload.get("daily_units"),
         "end_year": end_year,
+        "model": config["data"]["model"],
         "fetched_at": pd.Timestamp.now(tz="UTC").isoformat(timespec="seconds"),
     }
 
@@ -80,7 +82,7 @@ def fetch_city(city: City, config: dict[str, Any], force: bool = False) -> Path:
     payload = request_with_retries(config["data"]["archive_url"], build_params(city, config, end_year), config)
     frame = payload_to_frame(payload)
     frame.to_csv(csv_path, index=False, date_format="%Y-%m-%d")
-    meta_path.write_text(json.dumps(payload_metadata(payload, city, end_year), indent=2), encoding="utf-8")
+    meta_path.write_text(json.dumps(payload_metadata(payload, city, end_year, config), indent=2), encoding="utf-8")
     print(f"{city.name}: saved {len(frame):,} rows to {csv_path.name}")
     return csv_path
 
